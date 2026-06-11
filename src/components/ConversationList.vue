@@ -5,7 +5,7 @@
             v-for="item in items"
             :key="item.id"
         >
-            <RouterLink to="/conversation" >
+            <RouterLink :to=" `/conversation/${item.id}` " >
                 <a href="#">
                     <div class="flex justify-between items-center text-sm leading-5 text-gray-500">
                         <span>{{item.selectedModel}}</span>
