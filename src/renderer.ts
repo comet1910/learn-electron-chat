@@ -29,7 +29,7 @@ import { createApp } from 'vue';
 import {createRouter , createMemoryHistory} from 'vue-router'
 import App from './App.vue'
 import Home from './views/Home.vue'
-import Conversation from './views/ConversationList.vue';
+import Conversation from './views/Conversation.vue';
 import Settings from './views/Settings.vue';
 
 

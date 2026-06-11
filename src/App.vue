@@ -3,7 +3,9 @@
     <div class=" w-[300px] bg-gray-200 h-full border-r border-gray-300">
       <!-- 添加窗口滑动 -->
       <div class="h-[90%] overflow-y-auto"> 
+        <RouterLink to="">
         <ConversationList :items="items"/>
+      </RouterLink>
       </div>
       <div class="h-[10%] grid grid-cols-2 gap-2 p-2">
         <RouterLink to="/" > 
