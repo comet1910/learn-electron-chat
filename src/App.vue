@@ -24,16 +24,8 @@
         </button>
       </div>
     </div>
-    <div class="h-full flex-1 flex items-center">
-     <div class="w-[80%] mx-auto h-full" >
-        <div class="flex items-center h-[85%]">
-          {{selectedModel}}
-          <ProviderSelect :items="providers"  v-model="selectedModel" />
-        </div>
-        <div class="flex items-center h-[15%]">
-           <MessageInput />
-        </div>
-     </div>
+    <div class="h-full flex-1 flex ">
+      <RouterView/>
     
     </div>
   </div>
