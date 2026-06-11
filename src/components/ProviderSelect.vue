@@ -1,5 +1,5 @@
 <template>
-    <div class="provider-select">
+    <div class="provider-select w-full">
         <SelectRoot v-model="currentModel">
             <SelectTrigger class="flex w-full items-center justify-between 
              rounded-md py-1.5 px-3 shadow-sm border outline-none data=[placeholder]:text-gray-400">
