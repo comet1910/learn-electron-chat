@@ -1,13 +1,15 @@
 import { app, BrowserWindow } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
+import 'dotenv/config'
+import OpenAI from 'openai';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
 
-const createWindow = () => {
+const createWindow = async  () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1024,
@@ -28,7 +30,25 @@ const createWindow = () => {
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
+
+  const client = new OpenAI({
+    apiKey: process.env['MODEL_API_KEY'],
+    baseURL: process.env['MODEL_BASE_URL'],
+  })
+  const resp = await client.chat.completions.create({
+    messages: [
+      {role: 'system' , content:'你是一名文学大师，用有文采的语言与我对话'},
+      {role: 'user' , content:'君子豹变的意思是什么'},
+
+    ],
+    model: 'qwen3-max',
+  })
+
+  console.log('resp',resp.choices[0])
+
 };
+
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
