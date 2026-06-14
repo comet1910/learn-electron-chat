@@ -21,7 +21,7 @@
         <RouterLink to="/settings" >
         <button
           class="shadow-sm inline-flex items-center justify-center
-            bg-green-50 text-green-700 hover:bg-green-700 border border-green-700 hover
+            bg-green-50 text-green-700 hover:bg-green-700 border border-green-700 hover:text-white
             h-[32px] py-[8px] px-[15px] text-sm rounded-[4px]"
         >
           <Icon icon="radix-icons:gear"  class="mr-2" ></Icon>
@@ -31,6 +31,9 @@
       </div>
     </div>
     <div class=" flex flex-col h-full w-full">
+      <Button color="purple" plain :loading icon-name="radix-icons:gear" @click="loading = true"> 
+        Hello there
+      </Button>
       <RouterView />
     </div>
   </div>
@@ -42,6 +45,8 @@ import {Icon} from '@iconify/vue'
 
 import {conversations} from './testData'
 import ConversationList from './components/ConversationList.vue';
+import Button from './components/Button.vue';
+const loading = ref(false)
 
 console.log('👋 This message is being logged by "App.vue", included via Vite');
 </script>
