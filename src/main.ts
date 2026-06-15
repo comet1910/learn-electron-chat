@@ -3,7 +3,8 @@ import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import 'dotenv/config'
 import OpenAI from 'openai';
-import fs from 'fs/promises'
+// import fs from 'fs/promises'
+import fs from 'fs'
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -32,27 +33,43 @@ const createWindow = async  () => {
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
 
+
   const client = new OpenAI({
     apiKey: process.env['MODEL_API_KEY'],
     baseURL: process.env['MODEL_BASE_URL'],
   })
 
-  const imageBuffer = await fs.readFile('img/dijia.jpg')
-  const base64Image = imageBuffer.toString('base64')
-  console.log('base64',base64Image)
+  const fileObj = await client.files.create({file: fs.createReadStream('img/2410.10315v2.pdf') , purpose:'file-extract' as any})
+  console.log(fileObj)
 
   const resp = await client.chat.completions.create({
-    messages:[{
-      role:'user',
-      content:[
-        {type: 'text',text:'图片中的内容是什么？'},
-        {type:'image_url', image_url:{url:`data:image/jpeg;base64, ${base64Image}`}}
-      ]
-    }],
-    model : 'qwen3.7-plus'
+    messages:[
+      {role:"system" , content: "你是一名人工智能助手"},
+      {role:"system" , content: `fileid://${fileObj.id}`},
+      {role:"user" , content:"概括这篇论文做了什么工作"},
+    ],
+
+    model:'qwen-long'
   })
+  
 
+    //识图测试
+  // const imageBuffer = await fs.readFile('img/dijia.jpg')
+  // const base64Image = imageBuffer.toString('base64')
+  // console.log('base64',base64Image)
 
+  // const resp = await client.chat.completions.create({
+  //   messages:[{
+  //     role:'user',
+  //     content:[
+  //       {type: 'text',text:'图片中的内容是什么？'},
+  //       {type:'image_url', image_url:{url:`data:image/jpeg;base64, ${base64Image}`}}
+  //     ]
+  //   }],
+  //   model : 'qwen3.7-plus'
+  // })
+
+  //对话测试
   // const client = new OpenAI({
   //   apiKey: process.env['MODEL_API_KEY'],
   //   baseURL: process.env['MODEL_BASE_URL'],
@@ -66,7 +83,7 @@ const createWindow = async  () => {
   //   model: 'qwen3-max',
   // })
 
-   console.log('resp',resp.choices[0])
+    console.log('resp',resp.choices[0])
 
 };
 
