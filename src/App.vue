@@ -39,14 +39,36 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import {ref} from 'vue'
-import {Icon} from '@iconify/vue'
 
-import {conversations} from './testData'
-import ConversationList from './components/ConversationList.vue';
-import Button from './components/Button.vue';
+
+<script setup lang="ts">
+import { onMounted ,ref} from 'vue'
+import {Icon} from '@iconify/vue'
+import { conversations, providers } from './testData'
+import { db } from './db'
+import ConversationList from './components/ConversationList.vue'
+import Button from './components/Button.vue'
+
 const loading = ref(false)
 
 console.log('👋 This message is being logged by "App.vue", included via Vite');
+
+onMounted(async () => {
+    //插入数据测试
+    // const insertedId = await db.providers.add(providers[0])
+    // console.log('insertedId',insertedId)
+
+    //查询测试
+    const items = await db.providers.where({id: 1 }).toArray()
+    console.log('items',items)
+
+    //更新
+    const updatedItem = await db.providers.update(1, { desc: 'updated desc' })
+    console.log('updatedItem', updatedItem)
+
+    //删除
+    const deletedItem = await db.providers.delete(1)
+    console.log('deletedItem', deletedItem)
+
+})
 </script>

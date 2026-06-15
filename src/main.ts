@@ -34,23 +34,23 @@ const createWindow = async  () => {
   mainWindow.webContents.openDevTools();
 
 
-  const client = new OpenAI({
-    apiKey: process.env['MODEL_API_KEY'],
-    baseURL: process.env['MODEL_BASE_URL'],
-  })
+  // const client = new OpenAI({
+  //   apiKey: process.env['MODEL_API_KEY'],
+  //   baseURL: process.env['MODEL_BASE_URL'],
+  // })
 
-  const fileObj = await client.files.create({file: fs.createReadStream('img/2410.10315v2.pdf') , purpose:'file-extract' as any})
-  console.log(fileObj)
+  // const fileObj = await client.files.create({file: fs.createReadStream('img/2410.10315v2.pdf') , purpose:'file-extract' as any})
+  // console.log(fileObj)
 
-  const resp = await client.chat.completions.create({
-    messages:[
-      {role:"system" , content: "你是一名人工智能助手"},
-      {role:"system" , content: `fileid://${fileObj.id}`},
-      {role:"user" , content:"概括这篇论文做了什么工作"},
-    ],
+  // const resp = await client.chat.completions.create({
+  //   messages:[
+  //     {role:"system" , content: "你是一名人工智能助手"},
+  //     {role:"system" , content: `fileid://${fileObj.id}`},
+  //     {role:"user" , content:"概括这篇论文做了什么工作"},
+  //   ],
 
-    model:'qwen-long'
-  })
+  //   model:'qwen-long'
+  // })
   
 
     //识图测试
@@ -83,7 +83,7 @@ const createWindow = async  () => {
   //   model: 'qwen3-max',
   // })
 
-    console.log('resp',resp.choices[0])
+    // console.log('resp',resp.choices[0])
 
 };
 
