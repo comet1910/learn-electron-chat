@@ -3,6 +3,7 @@ import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import 'dotenv/config'
 import OpenAI from 'openai';
+import fs from 'fs/promises'
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -35,16 +36,37 @@ const createWindow = async  () => {
     apiKey: process.env['MODEL_API_KEY'],
     baseURL: process.env['MODEL_BASE_URL'],
   })
-  const resp = await client.chat.completions.create({
-    messages: [
-      {role: 'system' , content:'你是一名文学大师，用有文采的语言与我对话'},
-      {role: 'user' , content:'君子豹变的意思是什么'},
 
-    ],
-    model: 'qwen3-max',
+  const imageBuffer = await fs.readFile('img/dijia.jpg')
+  const base64Image = imageBuffer.toString('base64')
+  console.log('base64',base64Image)
+
+  const resp = await client.chat.completions.create({
+    messages:[{
+      role:'user',
+      content:[
+        {type: 'text',text:'图片中的内容是什么？'},
+        {type:'image_url', image_url:{url:`data:image/jpeg;base64, ${base64Image}`}}
+      ]
+    }],
+    model : 'qwen3.7-plus'
   })
 
-  console.log('resp',resp.choices[0])
+
+  // const client = new OpenAI({
+  //   apiKey: process.env['MODEL_API_KEY'],
+  //   baseURL: process.env['MODEL_BASE_URL'],
+  // })
+  // const resp = await client.chat.completions.create({
+  //   messages: [
+  //     {role: 'system' , content:'你是一名文学大师，用有文采的语言与我对话'},
+  //     {role: 'user' , content:'君子豹变的意思是什么'},
+
+  //   ],
+  //   model: 'qwen3-max',
+  // })
+
+   console.log('resp',resp.choices[0])
 
 };
 
