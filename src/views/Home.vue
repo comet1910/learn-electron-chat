@@ -1,8 +1,8 @@
 <template>
      <div class="w-[80%] mx-auto h-full" >
         <div class="flex items-center h-[85%]">
-          {{selectedModel}}
-          <ProviderSelect :items="providers"  v-model="selectedModel" />
+          {{currentProvider}}
+          <ProviderSelect :items="providers"  v-model="currentProvider" />
         </div>
         <div class="flex items-center h-[15%]">
            <MessageInput />
@@ -15,36 +15,51 @@
 
 
 <script setup lang="ts">
-import {ref} from 'vue'
-import {Icon} from '@iconify/vue'
-import { ConversationProps , ProviderProps } from '../types'
+import { onMounted, ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { db } from '../db'
+import { ProviderProps } from '../types'
+import ProviderSelect from '../components/ProviderSelect.vue'
+import MessageInput from '../components/MessageInput.vue'
 
-import ProviderSelect from '../components/ProviderSelect.vue';
-import MessageInput from '../components/MessageInput.vue';
-const selectedModel = ref('')
+const currentProvider = ref('')
 
+const router = useRouter()
 
-const providers: ProviderProps[] = [
-    {
-        id: 1,
-        name: '文心一言',
-        desc: '文心一言 百度出品的大模型',
-        models: ['ERNIE-4.0-8K', 'ERNIE-3.5-8K', 'ERNIE-Speed-8K'],
-        avatar: 'https://qph.cf2.poecdn.net/main-thumb-pb-3004-50-jougqzjtwfqfyqprxbdwofvnwattmtrg.jp',
-        createdAt: '2024-07-03',
-        updatedAt: '2024-07-03'
-    },
-    {
-        id: 2,
-        name: '通义千问',
-        desc: '通义千问',
-        // https://help.aliyun.com/zh/dashscope/developer-reference/api-details?spm=a2c4g.11186623.0.
-        models: ['qwen-turbo', 'qwen-plus', 'qwen-max'],
-        avatar: 'https://qph.cf2.poecdn.net/main-thumb-pb-3004-50-jougqzjtwfqfyqprxbdwofvnwattmtrg.jp',
-        createdAt: '2024-07-03',
-        updatedAt: '2024-07-03'
+const providers = ref<ProviderProps[]>([])
+
+onMounted(async () => {
+    providers.value = await db.providers.toArray()
+})
+
+const modelInfo = computed(() => {
+    const [providerId, selectedModel] = currentProvider.value.split('/')
+    return {
+        providerId: parseInt(providerId),
+        selectedModel
     }
-]
+})
 
-console.log('👋 This message is being logged by "App.vue", included via Vite');
+const createConversation = async (question: string) => {
+    const { providerId, selectedModel } = modelInfo.value
+    const currentDate = new Date().toISOString()
+    const conversationId = await db.conversations.add({
+        title: question,
+        providerId,
+        selectedModel,
+        createdAt: currentDate,
+        updatedAt: currentDate
+    })
+
+    const newMessageId = await db.messages.add({
+    content: question,
+    conversationId,
+    createdAt: currentDate,
+    updatedAt: currentDate,
+    type: 'question'
+    })
+
+    router.push(`/conversation/${conversationId}?init=${newMessageId}`)
+}
+
 </script>
