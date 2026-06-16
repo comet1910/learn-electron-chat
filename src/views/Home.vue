@@ -5,7 +5,7 @@
           <ProviderSelect :items="providers"  v-model="currentProvider" />
         </div>
         <div class="flex items-center h-[15%]">
-           <MessageInput />
+           <MessageInput @create="createConversation"  />
         </div>
      </div>
 
@@ -22,6 +22,7 @@ import { ProviderProps } from '../types'
 import ProviderSelect from '../components/ProviderSelect.vue'
 import MessageInput from '../components/MessageInput.vue'
 
+const inputValue = ref('')
 const currentProvider = ref('')
 
 const router = useRouter()
