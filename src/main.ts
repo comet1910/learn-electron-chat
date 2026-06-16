@@ -1,10 +1,12 @@
-import { app, BrowserWindow } from 'electron';
-import path from 'node:path';
+import { app, BrowserWindow , ipcMain } from 'electron';
+import path from 'path';
 import started from 'electron-squirrel-startup';
 import 'dotenv/config'
 import OpenAI from 'openai';
 // import fs from 'fs/promises'
 import fs from 'fs'
+import { CreateChatProps } from './types'
+
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -20,6 +22,11 @@ const createWindow = async  () => {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
+
+  ipcMain.on('start-chat', async (event, content: CreateChatProps) => {
+    console.log('hey', content)
+  })
+// and load the index.html of the app
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {

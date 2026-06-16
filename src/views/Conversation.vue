@@ -18,13 +18,15 @@
   import MessageInput from '../components/MessageInput.vue'
   import MessageList from '../components/MessageList.vue';
 
-  import {MessageProps , ConversationProps} from '../types'
+  import {MessageProps , ConversationProps,CreateChatProps} from '../types'
   import {db} from '../db'
   const route = useRoute()
   const filteredMessages = ref<MessageProps[]>([])
   const conversation = ref<ConversationProps>()
   let conversationId = parseInt(route.params.id as string ) 
   const initMessageId = parseInt(route.query.init as string)
+  let lastQuestion = ''
+
   const creatingInitialMessage = async () => {
       const createdData: Omit<MessageProps, 'id'> = {
           content: '',
@@ -37,6 +39,21 @@
 
       const newMessageId = await db.messages.add(createdData)
       filteredMessages.value.push({ id: newMessageId, ...createdData })
+
+      if (conversation.value) {
+    // 1. 根据当前会话的 providerId 查找对应的服务商配置
+    const provider = await db.providers.where({ id: conversation.value.providerId }).first()
+
+    if (provider) {
+        // 2. 调用 Electron 暴露的 API，启动聊天任务
+        await window.electronAPI.startChat({
+            messageId: newMessageId,      // 前端生成的消息 ID（用于后续更新状态）
+            providerName: provider.name,  // 服务商名称（如 OpenAI, Anthropic 等）
+            selectedModel: conversation.value.selectedModel, // 用户选择的模型（如 gpt-4, claude-3）
+            content: lastQuestion         // 用户的提问内容
+        })
+    }
+}
   }
 
   watch(() => route.params.id, async (newId: string) => {
@@ -45,12 +62,12 @@
     filteredMessages.value = await db.messages.where({ conversationId }).toArray()
 })
 
-
-
   onMounted(async () => {
     conversation.value = await db.conversations.where({ id: conversationId }).first()
     filteredMessages.value = await db.messages.where({ conversationId }).toArray()
     if(initMessageId){
+      const lastMessage = await db.messages.where({ conversationId }).last()
+      lastQuestion = lastMessage?.content || ''
       await creatingInitialMessage()
     }
 
