@@ -18,7 +18,7 @@
   import MessageInput from '../components/MessageInput.vue'
   import MessageList from '../components/MessageList.vue';
 
-  import {MessageProps , ConversationProps,CreateChatProps} from '../types'
+  import {MessageProps , ConversationProps,CreateChatProps,MessageStatus} from '../types'
   import {db} from '../db'
   const route = useRoute()
   const filteredMessages = ref<MessageProps[]>([])
@@ -70,7 +70,34 @@
       lastQuestion = lastMessage?.content || ''
       await creatingInitialMessage()
     }
+   window.electronAPI.onUpdateMessage( async (streamData) => {
+    console.log('stream',streamData)
+    const { messageId, data } = streamData; // 解构出消息 ID 和数据包
+    // 1. 从数据库中查找当前正在更新的消息对象
+    const currentMessage = await db.messages.where({ id: messageId }).first();
 
+    if (currentMessage) {
+        // 2. 构造需要更新的数据对象
+        const updatedData = {
+            // 将新收到的 AI 回复片段追加到原有内容后面
+            content: currentMessage.content + data.result,
+            // 根据是否结束来更新状态：如果是结尾则 'finished'，否则继续 'streaming'
+            status: data.is_end ? 'finished' : ('streaming' as MessageStatus),
+            updatedAt: new Date().toISOString() // 更新时间戳
+        };
+
+        // 3. 持久化保存：更新 IndexedDB 中的记录
+        await db.messages.update(messageId, updatedData);
+
+        // 4. 响应式更新：在内存数组中找到对应项并替换，以触发 UI 刷新
+        const index = filteredMessages.value.findIndex(item => item.id === messageId);
+        if (index !== -1) {
+            filteredMessages.value[index] = { ...filteredMessages.value[index], ...updatedData };
+        }
+    }
+
+
+   })
   })
 
   </script>

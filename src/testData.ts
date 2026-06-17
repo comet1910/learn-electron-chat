@@ -33,8 +33,8 @@ export const messages: MessageProps[] = [
   export const providers:ProviderProps[] = [
     {
         id: 1,
-        name: '文心一言',
-        desc: '文心一言 百度出品的大模型',
+        name: 'qianfan',
+        desc: '百度千帆',
         models: ['ERNIE-4.0-8K', 'ERNIE-3.5-8K', 'ERNIE-Speed-8K'],
         avatar: 'https://qph.cf2.poecdn.net/main-thumb-pb-3004-50-jougqzjtwfqfyqprxbdwofvnwattmtrg.jp',
         createdAt: '2024-07-03',
@@ -42,10 +42,10 @@ export const messages: MessageProps[] = [
     },
     {
         id: 2,
-        name: '通义千问',
+        name: 'dashscope',
         desc: '通义千问',
         // https://help.aliyun.com/zh/dashscope/developer-reference/api-details?spm=a2c4g.11186623.0.
-        models: ['qwen-turbo', 'qwen-plus', 'qwen-max'],
+        models: ['qwen3.6-flash', 'qwen3.7-plus', 'qwen3.7-max'],
         avatar: 'https://qph.cf2.poecdn.net/main-thumb-pb-3004-50-jougqzjtwfqfyqprxbdwofvnwattmtrg.jp',
         createdAt: '2024-07-03',
         updatedAt: '2024-07-03'

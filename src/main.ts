@@ -23,8 +23,60 @@ const createWindow = async  () => {
     },
   });
 
-  ipcMain.on('start-chat', async (event, content: CreateChatProps) => {
-    console.log('hey', content)
+  ipcMain.on('start-chat', async (event, data: CreateChatProps) => {
+    console.log('hey', data)
+    const {content, providerName, selectedModel, messageId} = data
+    if (providerName === 'qianfan') {
+      //百度方式，暂不实现
+      // 1. 初始化客户端
+    // const client = new ChatCompletion()
+
+    // // 2. 发起流式请求
+    // const stream = await client.chat({
+    //     messages: [
+    //         { role: "user", content } // 用户发送的内容
+    //     ],
+    //     stream: true // 开启流式传输
+    // }, selectedModel)
+
+    // // 3. 遍历流式数据块
+    // for await (const chunk of stream) {
+    //     const { is_end, result } = chunk
+
+    //     // 4. 构造回传数据包
+    //     const content = {
+    //         messageId,
+    //         data: {
+    //             is_end,
+    //             result
+    //         }
+    //     }
+
+    //     // 5. 发送给渲染进程（前端）
+    //     mainWindow.webContents.send('update-message', content)
+    } else if (providerName === 'dashscope') {
+      const client = new OpenAI({
+        apiKey: process.env['MODEL_API_KEY'],
+        baseURL: process.env['MODEL_BASE_URL'],
+      })
+      const stream = await client.chat.completions.create({
+        model: selectedModel,
+        messages: [{ role: 'user', content }],
+        stream: true,
+      })
+      for await (const chunk of stream) {
+        const choice = chunk.choices[0]
+        if (!choice) continue
+        console.log(choice)
+        mainWindow.webContents.send('update-message', {
+          messageId,
+          data: {
+            is_end: choice.finish_reason === 'stop',
+            result: choice.delta.content || ''
+          }
+        })
+      }
+    }
   })
 // and load the index.html of the app
 
