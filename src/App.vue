@@ -1,33 +1,26 @@
 <template>
   <div class=" flex items-center justify-between h-screen">
-    <div class=" w-[300px] bg-gray-200 h-full border-r border-gray-300">
+    <div class=" w-[350px] bg-gray-200 h-full border-r border-gray-300">
       <!-- 添加窗口滑动 -->
       <div class="h-[90%] overflow-y-auto"> 
         <RouterLink to="">
-        <ConversationList :items="conversations"/>
+        <ConversationList :items="items"/>
         </RouterLink>
       </div>
       <div class="h-[10%] grid grid-cols-2 gap-2 p-2">
         <RouterLink to="/" > 
-        <button
-          class="shadow-sm inline-flex items-center justify-center
-            bg-green-700 text-white hover:bg-green-700/90 border border-green-700
-            h-[32px] py-[8px] px-[15px] text-sm rounded-[4px]"
-        >
-          <Icon icon="radix-icons:chat-bubble" class="mr-2" ></Icon>
-          新建聊天
-        </button>
+       <Button icon-name="radix-icons:chat-bubble" class="w-full">
+        新建聊天
+       </Button>
       </RouterLink> 
         <RouterLink to="/settings" >
-        <button
-          class="shadow-sm inline-flex items-center justify-center
-            bg-green-50 text-green-700 hover:bg-green-700 border border-green-700 hover:text-white
-            h-[32px] py-[8px] px-[15px] text-sm rounded-[4px]"
-        >
-          <Icon icon="radix-icons:gear"  class="mr-2" ></Icon>
+        <Button icon-name="radix-icons:gear" plain class="w-full">
           应用设置
-        </button>
+        </Button>
       </RouterLink>
+       <Button icon-name="radix-icons:chat-bubble" class="w-full" @click="testAdd" >
+        测试新增
+       </Button>
       </div>
     </div>
     <div class=" flex flex-col h-full w-full">
@@ -42,17 +35,32 @@
 
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, computed } from 'vue'
 
 import { db, initProviders } from './db'
-import { ConversationProps } from './types'
+import { useConversationStore } from './stores/conversation'
 import ConversationList from './components/ConversationList.vue'
 import Button from './components/Button.vue'
 
-const conversations = ref<ConversationProps[]>([])
+import {conversations} from './testData'
 
+let index = 0
+const conversationStore = useConversationStore()
+const items = computed(() => conversationStore.items)
 onMounted(async () => {
-    await initProviders()
-    conversations.value = await db.conversations.toArray()
+  await initProviders()
+  conversationStore.items = await db.conversations.toArray()
 })
+
+//测试新增
+const testAdd = () => {
+  index++
+  conversationStore.items.push(conversations[index])
+}
+//测试重置
+const testReset = () => {
+  conversationStore.$reset()
+}
+
+
 </script>
