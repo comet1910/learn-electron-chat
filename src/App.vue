@@ -5,6 +5,7 @@
       <div class="h-[90%] overflow-y-auto"> 
         <RouterLink to="">
         <ConversationList :items="items"/>
+        <h3>{{conversationStore.totalNumber}}</h3>
         </RouterLink>
       </div>
       <div class="h-[10%] grid grid-cols-2 gap-2 p-2">
@@ -18,9 +19,7 @@
           应用设置
         </Button>
       </RouterLink>
-       <Button icon-name="radix-icons:chat-bubble" class="w-full" @click="testAdd" >
-        测试新增
-       </Button>
+
       </div>
     </div>
     <div class=" flex flex-col h-full w-full">
@@ -37,30 +36,19 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
 
-import { db, initProviders } from './db'
+import { initProviders } from './db'
 import { useConversationStore } from './stores/conversation'
 import ConversationList from './components/ConversationList.vue'
 import Button from './components/Button.vue'
 
-import {conversations} from './testData'
 
-let index = 0
 const conversationStore = useConversationStore()
 const items = computed(() => conversationStore.items)
 onMounted(async () => {
   await initProviders()
-  conversationStore.items = await db.conversations.toArray()
+  conversationStore.fetchConversations()
 })
 
-//测试新增
-const testAdd = () => {
-  index++
-  conversationStore.items.push(conversations[index])
-}
-//测试重置
-const testReset = () => {
-  conversationStore.$reset()
-}
 
 
 </script>
