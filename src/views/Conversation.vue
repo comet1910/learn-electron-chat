@@ -21,14 +21,16 @@
   import {MessageProps , ConversationProps,CreateChatProps,MessageStatus} from '../types'
   import {db} from '../db'
   import {useConversationStore} from '../stores/conversation'
+  import {useMessageStore} from '../stores/message'
 
-    const conversationStore = useConversationStore()
+  const messageStore = useMessageStore()
+  const conversationStore = useConversationStore()
   const route = useRoute()
-  const filteredMessages = ref<MessageProps[]>([])
+  const filteredMessages = computed(() => messageStore.items)
   
   let conversationId = ref(parseInt(route.params.id as string ) )
   const initMessageId = parseInt(route.query.init as string)
-  let lastQuestion = ''
+  const lastQuestion = computed(() => messageStore.getLastQuestion(conversationId.value) )
   const conversation = computed(() => conversationStore.getConversationById(conversationId.value))
 
 
@@ -42,7 +44,7 @@
           status: 'loading'
       }
 
-      const newMessageId = await db.messages.add(createdData)
+      const newMessageId = await messageStore.createMessage(createdData)
       filteredMessages.value.push({ id: newMessageId, ...createdData })
 
       if (conversation.value) {
@@ -55,7 +57,7 @@
             messageId: newMessageId,      // 前端生成的消息 ID（用于后续更新状态）
             providerName: provider.name,  // 服务商名称（如 OpenAI, Anthropic 等）
             selectedModel: conversation.value.selectedModel, // 用户选择的模型（如 gpt-4, claude-3）
-            content: lastQuestion         // 用户的提问内容
+            content: lastQuestion.value?.content  || ''       // 用户的提问内容
         })
     }
 }
@@ -63,43 +65,19 @@
 
   watch(() => route.params.id, async (newId: string) => {
     conversationId.value = parseInt(newId)
-   
-    filteredMessages.value = await db.messages.where({ conversationId:conversationId.value }).toArray()
+    await messageStore.fetchMessagesByConversation(conversationId.value)
 })
 
   onMounted(async () => {
    
-    filteredMessages.value = await db.messages.where({ conversationId:conversationId.value }).toArray()
+    await messageStore.fetchMessagesByConversation(conversationId.value)
     if(initMessageId){
-      const lastMessage = await db.messages.where({ conversationId :conversationId.value}).last()
-      lastQuestion = lastMessage?.content || ''
       await creatingInitialMessage()
     }
    window.electronAPI.onUpdateMessage( async (streamData) => {
     console.log('stream',streamData)
-    const { messageId, data } = streamData; // 解构出消息 ID 和数据包
-    // 1. 从数据库中查找当前正在更新的消息对象
-    const currentMessage = await db.messages.where({ id: messageId }).first();
-
-    if (currentMessage) {
-        // 2. 构造需要更新的数据对象
-        const updatedData = {
-            // 将新收到的 AI 回复片段追加到原有内容后面
-            content: currentMessage.content + data.result,
-            // 根据是否结束来更新状态：如果是结尾则 'finished'，否则继续 'streaming'
-            status: data.is_end ? 'finished' : ('streaming' as MessageStatus),
-            updatedAt: new Date().toISOString() // 更新时间戳
-        };
-
-        // 3. 持久化保存：更新 IndexedDB 中的记录
-        await db.messages.update(messageId, updatedData);
-
-        // 4. 响应式更新：在内存数组中找到对应项并替换，以触发 UI 刷新
-        const index = filteredMessages.value.findIndex(item => item.id === messageId);
-        if (index !== -1) {
-            filteredMessages.value[index] = { ...filteredMessages.value[index], ...updatedData };
-        }
-    }
+    messageStore.updateMessage(streamData)
+    
 
 
    })
