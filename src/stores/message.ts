@@ -59,6 +59,10 @@ export const useMessageStore = defineStore('message', {
     // 获取最后对话的message
     getLastQuestion: (state) => (conversationId: number) => {
         return state.items.findLast(item => item.conversationId === conversationId && item.type === 'question')
+    },
+    //模型生成时不能对话
+    isMessageLoading:(state) => {
+        return state.items.some(item => item.status === 'loading' || item.status === 'streaming')
     }
 }
 })
