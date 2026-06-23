@@ -25,7 +25,7 @@ const createWindow = async  () => {
 
   ipcMain.on('start-chat', async (event, data: CreateChatProps) => {
     console.log('hey', data)
-    const {content, providerName, selectedModel, messageId} = data
+    const {providerName, messages,selectedModel, messageId} = data
     if (providerName === 'qianfan') {
       //百度方式，暂不实现
       // 1. 初始化客户端
@@ -60,8 +60,8 @@ const createWindow = async  () => {
         baseURL: process.env['MODEL_BASE_URL'],
       })
       const stream = await client.chat.completions.create({
+        messages:messages as any ,
         model: selectedModel,
-        messages: [{ role: 'user', content }],
         stream: true,
       })
       for await (const chunk of stream) {

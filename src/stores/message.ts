@@ -39,12 +39,11 @@ export const useMessageStore = defineStore('message', {
             if (currentMessage) {
                 // 3. 构造需要更新的数据对象
                 const updatedData = {
-                    // 将新收到的内容片段(data.result)追加到原有内容后面
-                    content: currentMessage.content + data.result,
                     // 判断是否结束：如果是结尾则标记为 'finished'，否则保持 'streaming'
                     status: data.is_end ? 'finished' : ('streaming' as MessageStatus),
                     // 更新时间戳
-                    updatedAt: new Date().toISOString()
+                    updatedAt: new Date().toISOString(),
+                    ...(!data.is_end && {content:currentMessage.content + data.result})
                 };
                 // 4. 持久化保存：更新 IndexedDB 中的记录
                 await db.messages.update(messageId, updatedData);
