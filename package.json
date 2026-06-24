@@ -54,6 +54,7 @@
     "dexie": "^4.4.3",
     "dotenv": "^17.4.2",
     "electron-squirrel-startup": "^1.0.1",
+    "markdown-it-highlightjs": "^4.3.0",
     "openai": "^6.42.0",
     "pinia": "^3.0.4",
     "radix-vue": "^1.9.17",
