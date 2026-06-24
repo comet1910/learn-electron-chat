@@ -21,10 +21,8 @@
   import {MessageProps , MessageListInstance} from '../types'
   import { useProviderStore } from '../stores/provider'
 
-  import {db} from '../db'
   import {useConversationStore} from '../stores/conversation'
   import {useMessageStore} from '../stores/message'
-  import { messages } from 'src/testData.js';
 
   const inputValue = ref('')
   const messageListRef = ref<MessageListInstance>()
@@ -45,7 +43,7 @@
   )
   let conversationId = ref(parseInt(route.params.id as string ) )
   const initMessageId = parseInt(route.query.init as string)
-  const lastQuestion = computed(() => messageStore.getLastQuestion(conversationId.value) )
+
   const conversation = computed(() => conversationStore.getConversationById(conversationId.value))
   const sendNewMessage = async (question: string) => {
       if (question) {
@@ -82,6 +80,7 @@
       }
 
       const newMessageId = await messageStore.createMessage(createdData)
+      await messageScrollToBottom()
       filteredMessages.value.push({ id: newMessageId, ...createdData })
 
       if (conversation.value) {
@@ -111,9 +110,24 @@
     if(initMessageId){
       await creatingInitialMessage()
     }
+    let currentMessageListHeight = 0
+    const checkAndScrollToBottom = async () => {
+      if (messageListRef.value) {
+        const newHeight = messageListRef.value.ref.clientHeight
+        console.log('the newHeight', newHeight)
+        console.log('the currentMessageListHeight', currentMessageListHeight)
+        if (newHeight > currentMessageListHeight) {
+          console.log('scroll to bottom')
+          currentMessageListHeight = newHeight
+          await messageScrollToBottom()
+        }
+      }
+    }
    window.electronAPI.onUpdateMessage( async (streamData) => {
     console.log('stream',streamData)
     messageStore.updateMessage(streamData)
+    await nextTick()
+    checkAndScrollToBottom()
    })
   })
 
