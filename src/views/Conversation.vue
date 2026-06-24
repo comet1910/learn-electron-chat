@@ -19,6 +19,8 @@
   import MessageList from '../components/MessageList.vue';
 
   import {MessageProps , ConversationProps,CreateChatProps,MessageStatus} from '../types'
+  import { useProviderStore } from '../stores/provider'
+
   import {db} from '../db'
   import {useConversationStore} from '../stores/conversation'
   import {useMessageStore} from '../stores/message'
@@ -26,6 +28,7 @@
 
   const inputValue = ref('')
   const messageStore = useMessageStore()
+  const provdierStore = useProviderStore()
   const conversationStore = useConversationStore()
   const route = useRoute()
   const filteredMessages = computed(() => messageStore.items)
@@ -75,25 +78,24 @@
       filteredMessages.value.push({ id: newMessageId, ...createdData })
 
       if (conversation.value) {
-    // 1. 根据当前会话的 providerId 查找对应的服务商配置
-    const provider = await db.providers.where({ id: conversation.value.providerId }).first()
+        const provider = provdierStore.getProviderById(conversation.value.providerId)
 
-    if (provider) {
-        // 2. 调用 Electron 暴露的 API，启动聊天任务
-        await window.electronAPI.startChat({
-            messageId: newMessageId,      // 前端生成的消息 ID（用于后续更新状态）
-            providerName: provider.name,  // 服务商名称（如 OpenAI, Anthropic 等）
-            selectedModel: conversation.value.selectedModel, // 用户选择的模型（如 gpt-4, claude-3）
-            messages:sendedMessages.value
-        })
-    }
-}
+      if (provider) {
+          // 2. 调用 Electron 暴露的 API，启动聊天任务
+          await window.electronAPI.startChat({
+              messageId: newMessageId,      // 前端生成的消息 ID（用于后续更新状态）
+              providerName: provider.name,  // 服务商名称（如 OpenAI, Anthropic 等）
+              selectedModel: conversation.value.selectedModel, // 用户选择的模型（如 gpt-4, claude-3）
+              messages:sendedMessages.value
+          })
+      }
+      }
   }
 
   watch(() => route.params.id, async (newId: string) => {
     conversationId.value = parseInt(newId)
     await messageStore.fetchMessagesByConversation(conversationId.value)
-})
+  })
 
   onMounted(async () => {
    

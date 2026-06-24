@@ -18,22 +18,18 @@
 import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { db } from '../db'
-import { ProviderProps } from '../types'
+
 import ProviderSelect from '../components/ProviderSelect.vue'
 import MessageInput from '../components/MessageInput.vue'
 import { useConversationStore } from '../stores/conversation'
+import { useProviderStore } from '../stores/provider'
 const inputValue = ref('')
 const currentProvider = ref('')
 
 const router = useRouter()
-
-const providers = ref<ProviderProps[]>([])
 const conversationStore = useConversationStore()
-
-onMounted(async () => {
-    providers.value = await db.providers.toArray()
-})
-
+const providerStore = useProviderStore()
+const providers = computed(() => providerStore.items)
 const modelInfo = computed(() => {
     const [providerId, selectedModel] = currentProvider.value.split('/')
     return {
@@ -60,7 +56,7 @@ const createConversation = async (question: string) => {
     updatedAt: currentDate,
     type: 'question'
     })
-
+    conversationStore.selectedId = conversationId
     router.push(`/conversation/${conversationId}?init=${newMessageId}`)
 }
 

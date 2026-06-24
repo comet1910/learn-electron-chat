@@ -4,11 +4,13 @@ import {db} from '../db'
 
 export interface ConversationStore {
   items: ConversationProps[];
+  selectedId:number;
 }
 
 export const useConversationStore = defineStore('conversation', {
   state: (): ConversationStore => ({
-    items: []
+    items: [],
+    selectedId: -1,
   }),
   actions:{
     async fetchConversations(){
