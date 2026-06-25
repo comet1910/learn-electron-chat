@@ -1,12 +1,13 @@
-import { app, BrowserWindow , ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, protocol, net } from 'electron'
 import path from 'path';
 import fs from 'fs/promises';
+import url from 'url'
 import started from 'electron-squirrel-startup';
 import 'dotenv/config'
 import OpenAI from 'openai';
 import { CreateChatProps } from './types'
 import { convertMessages } from './helper'
-
+import { lookup } from 'mime-types'
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -22,6 +23,22 @@ const createWindow = async  () => {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
+
+    protocol.handle('safe-file', async (request) => {
+    console.log(request.url)
+    const filePath = decodeURIComponent(request.url.slice('safe-file://'.length))
+    console.log(filePath)
+    // const data = await fs.readFile(filePath)
+    // return new Response(data, {
+    //   status: 200,
+    //   headers: {
+    //     'Content-Type': lookup(filePath) as string
+    //   }
+    // })
+    const newFilePath = url.pathToFileURL(filePath).toString()
+    console.log(newFilePath)
+    return net.fetch(newFilePath)
+  })
 
   ipcMain.handle('copy-image-to-user-dir', async (event, sourcePath: string) => {
     const userDataPath = app.getPath('userData')
