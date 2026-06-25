@@ -57,7 +57,8 @@ const handleImageUpload = (event: Event) => {
 }
 const onCreate = () => {
   if(model.value && model.value.trim() !== '') {
-    emit('create', model.value, selectedImage?.path || undefined)
+    const imagePath = selectedImage ? window.electronAPI.getPathForFile(selectedImage) : undefined
+    emit('create', model.value, imagePath)
   } 
 }
 

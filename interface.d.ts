@@ -4,6 +4,7 @@ export interface IElectronAPI {
     startChat: (data: CreateChatProps) => void;
     onUpdateMessage: (callback: OnUpdatedCallback) => any;
     copyImageToUserDir: (sourcePath: string) => Promise<string>;
+    getPathForFile: (file: File) => string;
 }
 
 declare global {
