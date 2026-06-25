@@ -59,6 +59,8 @@ const onCreate = () => {
   if(model.value && model.value.trim() !== '') {
     const imagePath = selectedImage ? window.electronAPI.getPathForFile(selectedImage) : undefined
     emit('create', model.value, imagePath)
+    selectedImage = null
+    imagePreview.value = ''
   } 
 }
 

@@ -31,27 +31,11 @@ export const useMessageStore = defineStore('message', {
 
         },
         //更新message
-        async updateMessage(streamData: UpdatedStreamData) {
-            // 1. 解构传入的流式数据包
-            const { messageId, data } = streamData;
-            // 2. 在当前的内存列表中找到对应的消息对象
-            const currentMessage = this.items.find(item => item.id === messageId);
-            if (currentMessage) {
-                // 3. 构造需要更新的数据对象
-                const updatedData = {
-                    // 判断是否结束：如果是结尾则标记为 'finished'，否则保持 'streaming'
-                    status: data.is_end ? 'finished' : ('streaming' as MessageStatus),
-                    // 更新时间戳
-                    updatedAt: new Date().toISOString(),
-                    ...(!data.is_end && {content:currentMessage.content + data.result})
-                };
-                // 4. 持久化保存：更新 IndexedDB 中的记录
-                await db.messages.update(messageId, updatedData);
-                // 5. 响应式更新：找到内存数组中的索引并替换，触发 UI 刷新
-                const index = this.items.findIndex(item => item.id === messageId);
-                if (index !== -1) {
-                    this.items[index] = { ...this.items[index], ...updatedData };
-                }
+        async updateMessage(messageId: number, updatedData: Partial<MessageProps>) {
+            await db.messages.update(messageId, updatedData)
+            const index = this.items.findIndex(item => item.id === messageId)
+            if (index !== -1) {
+                this.items[index] = { ...this.items[index], ...updatedData }
             }
         }
     },
