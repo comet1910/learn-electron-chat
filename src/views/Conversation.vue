@@ -37,7 +37,8 @@
         .map(message =>{
           return {
             role: message.type === 'question' ? 'user':'assistant',
-            content:message.content
+            content: message.content,
+            ...(message.imagePath && { imagePath: message.imagePath })
           }
         })
   )
