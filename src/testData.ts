@@ -49,5 +49,16 @@ export const messages: MessageProps[] = [
         avatar: 'https://qph.cf2.poecdn.net/main-thumb-pb-3004-50-jougqzjtwfqfyqprxbdwofvnwattmtrg.jp',
         createdAt: '2024-07-03',
         updatedAt: '2024-07-03'
-    }
+    },
+    {     
+        id: 3,
+        name: 'deepseek', 
+        title: 'DeepSeek',
+        desc: 'DeepSeek',
+        // https://api-docs.deepseek.com/zh-cn/
+        models: ['deepseek-v4-pro'],
+        avatar: 'https://www.coonav.com/wp-content/uploads/2025/03/20250305200845942.png',
+        createdAt: '2024-12-27',
+        updatedAt: '2024-12-27'
+  }
 ]
