@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { AppConfig } from '../types'
+import i18n from '../i18n'
 
 export const useConfigStore = defineStore('config', () => {
   const language = ref<'zh' | 'en'>('zh')
@@ -12,11 +13,13 @@ export const useConfigStore = defineStore('config', () => {
     language.value = config.language
     fontSize.value = config.fontSize
     loaded.value = true
+    i18n.global.locale.value = config.language
     applyFontSize()
   }
 
   async function setLanguage(lang: 'zh' | 'en') {
     language.value = lang
+    i18n.global.locale.value = lang
     await persist()
   }
 

@@ -10,12 +10,12 @@
       <div class="h-[10%] grid grid-cols-2 gap-2 p-2">
         <RouterLink to="/" > 
        <Button icon-name="radix-icons:chat-bubble" class="w-full">
-        新建聊天
+        {{ $t('app.newChat') }}
        </Button>
       </RouterLink> 
         <RouterLink to="/settings" >
         <Button icon-name="radix-icons:gear" plain class="w-full">
-          应用设置
+          {{ $t('app.settings') }}
         </Button>
       </RouterLink>
 

@@ -1,11 +1,11 @@
 <template>
   <div class="h-full p-8 max-w-lg">
-    <h2 class="text-lg font-semibold mb-6">应用设置</h2>
+    <h2 class="text-lg font-semibold mb-6">{{ $t('app.settings') }}</h2>
 
     <div class="space-y-6">
       <!-- 语言设置 -->
       <div>
-        <label class="block text-sm font-medium mb-2">语言</label>
+        <label class="block text-sm font-medium mb-2">{{ $t('app.language') }}</label>
         <SelectRoot v-model="selectedLanguage" @update:modelValue="onLanguageChange">
           <SelectTrigger
             class="inline-flex w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -31,7 +31,7 @@
 
       <!-- 字体大小设置 -->
       <div>
-        <label class="block text-sm font-medium mb-2">字体大小</label>
+        <label class="block text-sm font-medium mb-2">{{ $t('app.fontSize') }}</label>
         <NumberFieldRoot
           v-model="fontSizeValue"
           :min="10"
