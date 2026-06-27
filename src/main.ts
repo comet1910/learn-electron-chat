@@ -9,6 +9,8 @@ import { CreateChatProps } from './types'
 import { convertMessages } from './helper'
 import { lookup } from 'mime-types'
 import { createProvider } from './providers/createProvider'
+import { loadConfig, saveConfig } from './config'
+import { AppConfig } from './types'
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -39,6 +41,15 @@ const createWindow = async  () => {
     const newFilePath = url.pathToFileURL(filePath).toString()
     console.log(newFilePath)
     return net.fetch(newFilePath)
+  })
+
+  ipcMain.handle('get-config', async () => {
+    return loadConfig()
+  })
+
+  ipcMain.handle('set-config', async (_event, config: AppConfig) => {
+    await saveConfig(config)
+    return config
   })
 
   ipcMain.handle('copy-image-to-user-dir', async (event, sourcePath: string) => {

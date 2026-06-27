@@ -38,18 +38,21 @@ import { onMounted, computed } from 'vue'
 import { initProviders } from './db'
 import { useConversationStore } from './stores/conversation'
 import { useProviderStore } from './stores/provider'
+import { useConfigStore } from './stores/config'
 import ConversationList from './components/ConversationList.vue'
 import Button from './components/Button.vue'
 
 
 const conversationStore = useConversationStore()
 const provdierStore = useProviderStore()
+const configStore = useConfigStore()
 const items = computed(() => conversationStore.items)
 onMounted(async () => {
   await initProviders()
   // 获取最初需要的数据
   conversationStore.fetchConversations()
   provdierStore.fetchProviders()
+  configStore.loadConfig()
 })
 
 
