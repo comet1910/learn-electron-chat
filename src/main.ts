@@ -64,8 +64,8 @@ const createWindow = async  () => {
 
   ipcMain.on('start-chat', async (event, data: CreateChatProps) => {
     console.log('hey', data)
-    const {providerName, messages,selectedModel, messageId} = data
-    const provider = createProvider(providerName)
+    const {providerName, messages,selectedModel, messageId, apiKey, baseUrl} = data
+    const provider = createProvider(providerName, apiKey, baseUrl)
     const stream = await provider.chat(messages, selectedModel)
   
     for await (const chunk of stream) {

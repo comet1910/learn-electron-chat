@@ -18,6 +18,7 @@ import MessageList from '../components/MessageList.vue'
 import { useConversationStore } from '../stores/conversation'
 import { useMessageStore } from '../stores/message'
 import { useProviderStore } from '../stores/provider'
+import { useModelConfigStore } from '../stores/modelConfig'
 import { MessageProps, MessageListInstance, MessageStatus } from '../types'
 import { db } from '../db'
 const inputValue = ref('')
@@ -27,6 +28,7 @@ const route = useRoute()
 const conversationStore = useConversationStore()
 const messageStore = useMessageStore()
 const provdierStore = useProviderStore()
+const modelConfigStore = useModelConfigStore()
 const filteredMessages = computed(() => messageStore.items)
 const sendedMessages = computed(() => filteredMessages.value
   .filter(message => message.status!== 'loading')
@@ -87,11 +89,13 @@ const creatingInitialMessage = async () => {
     const provider = provdierStore.getProviderById(convsersation.value.providerId)
     if (provider) {
       console.log('provider', provider)
+      const config = modelConfigStore.getConfigByName(provider.name)
       await window.electronAPI.startChat({
         messageId: newMessageId,
         providerName: provider.name,
         selectedModel: convsersation.value.selectedModel,
-        messages: sendedMessages.value
+        messages: sendedMessages.value,
+        ...(config ? { apiKey: config.apiKey, baseUrl: config.baseUrl } : {}),
       })
     }
   }
@@ -103,6 +107,7 @@ watch(() => route.params.id, async (newId: string) => {
   currentMessageListHeight = 0
 })
 onMounted(async () => {
+  await modelConfigStore.fetchConfigs()
   await messageStore.fetchMessagesByConversation(conversationId.value)
   await messageScrollToBottom()
   if (initMessageId) {

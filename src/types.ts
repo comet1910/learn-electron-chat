@@ -43,6 +43,8 @@ export interface CreateChatProps{
     providerName: string;
     selectedModel: string;
     messageId: number;
+    apiKey?: string;
+    baseUrl?: string;
 }
 
 export interface UpdatedStreamData{
@@ -73,4 +75,14 @@ export interface BaiduChunkProps {
 export interface AppConfig {
   language: 'zh' | 'en'
   fontSize: number
+}
+
+export interface ModelConfig {
+  id?: number
+  name: string
+  displayName: string
+  apiKey: string
+  baseUrl: string
+  createdAt: string
+  updatedAt: string
 }
